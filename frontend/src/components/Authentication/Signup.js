@@ -22,9 +22,10 @@ const Signup = () => {
 
   const submitHandler = async () => {
     setPicLoading(true);
+
     if (!name || !email || !password || !confirmpassword) {
       toast({
-        title: "Please Fill all the Feilds",
+        title: "Please Fill all the Fields",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -33,6 +34,7 @@ const Signup = () => {
       setPicLoading(false);
       return;
     }
+
     if (password !== confirmpassword) {
       toast({
         title: "Passwords Do Not Match",
@@ -41,17 +43,20 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+      setPicLoading(false);
       return;
     }
-    console.log(name, email, password, pic);
+
     try {
       const config = {
         headers: {
           "Content-type": "application/json",
         },
       };
+
+      // ✅ Correct Render Backend URL
       const { data } = await axios.post(
-        "/api/user",
+        "https://chat-app-backend-xftk.onrender.com/api/user",
         {
           name,
           email,
@@ -60,7 +65,7 @@ const Signup = () => {
         },
         config
       );
-      console.log(data);
+
       toast({
         title: "Registration Successful",
         status: "success",
@@ -68,6 +73,7 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+
       localStorage.setItem("userInfo", JSON.stringify(data));
       setPicLoading(false);
       history.push("/chats");
@@ -86,6 +92,7 @@ const Signup = () => {
 
   const postDetails = (pics) => {
     setPicLoading(true);
+
     if (pics === undefined) {
       toast({
         title: "Please Select an Image!",
@@ -94,14 +101,16 @@ const Signup = () => {
         isClosable: true,
         position: "bottom",
       });
+      setPicLoading(false);
       return;
     }
-    console.log(pics);
+
     if (pics.type === "image/jpeg" || pics.type === "image/png") {
       const data = new FormData();
       data.append("file", pics);
       data.append("upload_preset", "chat-app");
       data.append("cloud_name", "piyushproj");
+
       fetch("https://api.cloudinary.com/v1_1/piyushproj/image/upload", {
         method: "post",
         body: data,
@@ -109,7 +118,6 @@ const Signup = () => {
         .then((res) => res.json())
         .then((data) => {
           setPic(data.url.toString());
-          console.log(data.url.toString());
           setPicLoading(false);
         })
         .catch((err) => {
@@ -138,6 +146,7 @@ const Signup = () => {
           onChange={(e) => setName(e.target.value)}
         />
       </FormControl>
+
       <FormControl id="email" isRequired>
         <FormLabel>Email Address</FormLabel>
         <Input
@@ -146,6 +155,7 @@ const Signup = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
+
       <FormControl id="password" isRequired>
         <FormLabel>Password</FormLabel>
         <InputGroup size="md">
@@ -161,12 +171,13 @@ const Signup = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
-      <FormControl id="password" isRequired>
+
+      <FormControl id="confirmpassword" isRequired>
         <FormLabel>Confirm Password</FormLabel>
         <InputGroup size="md">
           <Input
             type={show ? "text" : "password"}
-            placeholder="Confirm password"
+            placeholder="Confirm Password"
             onChange={(e) => setConfirmpassword(e.target.value)}
           />
           <InputRightElement width="4.5rem">
@@ -176,8 +187,9 @@ const Signup = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
+
       <FormControl id="pic">
-        <FormLabel>Upload your Picture</FormLabel>
+        <FormLabel>Upload Your Picture</FormLabel>
         <Input
           type="file"
           p={1.5}
@@ -185,6 +197,7 @@ const Signup = () => {
           onChange={(e) => postDetails(e.target.files[0])}
         />
       </FormControl>
+
       <Button
         colorScheme="blue"
         width="100%"
