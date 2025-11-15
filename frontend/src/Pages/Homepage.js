@@ -8,24 +8,26 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+
 import { useEffect } from "react";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router-dom";
+
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 
 function Homepage() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userInfo"));
 
-    if (user) history.push("/chats");
-  }, [history]);
+    if (user) navigate("/chats");
+  }, [navigate]);
 
   return (
     <Container maxW="xl" centerContent>
       <Box
-        d="flex"
+        display="flex"
         justifyContent="center"
         p={3}
         bg="white"
@@ -38,12 +40,14 @@ function Homepage() {
           Chat App
         </Text>
       </Box>
+
       <Box bg="#F0F8FF" w="100%" p={4} borderRadius="lg" borderWidth="1px">
         <Tabs isFitted variant="soft-rounded">
           <TabList mb="1em">
             <Tab>Login</Tab>
             <Tab>Sign Up</Tab>
           </TabList>
+
           <TabPanels>
             <TabPanel>
               <Login />
