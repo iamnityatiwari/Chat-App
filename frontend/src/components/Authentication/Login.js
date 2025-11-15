@@ -5,25 +5,26 @@ import { VStack } from "@chakra-ui/layout";
 import { useState } from "react";
 import axios from "axios";
 import { useToast } from "@chakra-ui/react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";   // ✅ Updated
 import { ChatState } from "../../Context/ChatProvider";
 
 const Login = () => {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const toast = useToast();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();     // ✅ Updated
   const { setUser } = ChatState();
 
   const submitHandler = async () => {
     setLoading(true);
+
     if (!email || !password) {
       toast({
-        title: "Please Fill all the Feilds",
+        title: "Please Fill all the Fields",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -41,7 +42,7 @@ const Login = () => {
       };
 
       const { data } = await axios.post(
-        "/api/user/login",
+        "https://chat-app-backend-xftk.onrender.com/api/user/login",   // ✅ FIXED URL
         { email, password },
         config
       );
@@ -53,19 +54,22 @@ const Login = () => {
         isClosable: true,
         position: "bottom",
       });
+
       setUser(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
+
       setLoading(false);
-      history.push("/chats");
+      navigate("/chats");    // ✅ Updated navigation
     } catch (error) {
       toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
+        title: "Error Occurred!",
+        description: error?.response?.data?.message || "Unable to login",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "bottom",
       });
+
       setLoading(false);
     }
   };
@@ -81,6 +85,7 @@ const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
+
       <FormControl id="password" isRequired>
         <FormLabel>Password</FormLabel>
         <InputGroup size="md">
@@ -97,6 +102,7 @@ const Login = () => {
           </InputRightElement>
         </InputGroup>
       </FormControl>
+
       <Button
         colorScheme="blue"
         width="100%"
@@ -106,6 +112,7 @@ const Login = () => {
       >
         Login
       </Button>
+
       <Button
         variant="solid"
         colorScheme="red"
