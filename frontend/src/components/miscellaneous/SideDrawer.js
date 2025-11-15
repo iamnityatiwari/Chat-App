@@ -19,7 +19,9 @@ import {
 import { Tooltip } from "@chakra-ui/tooltip";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/avatar";
-import { useHistory } from "react-router-dom";
+// 🔥 FIXED: useHistory removed → useNavigate
+import { useNavigate } from "react-router-dom";
+
 import { useState } from "react";
 import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
@@ -51,11 +53,13 @@ function SideDrawer() {
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const history = useHistory();
+
+  // 🔥 FIX: useNavigate()
+  const navigate = useNavigate();
 
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
-    history.push("/");
+    navigate("/"); // 🔥 FIXED
   };
 
   const handleSearch = async () => {
@@ -163,8 +167,10 @@ function SideDrawer() {
               />
               <BellIcon fontSize="2xl" m={1} />
             </MenuButton>
+
             <MenuList pl={2}>
               {!notification.length && "No New Messages"}
+
               {notification.map((notif) => (
                 <MenuItem
                   key={notif._id}
@@ -185,11 +191,14 @@ function SideDrawer() {
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
               <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} />
             </MenuButton>
+
             <MenuList>
               <ProfileModal user={user}>
                 <MenuItem>My Profile</MenuItem>
               </ProfileModal>
+
               <MenuDivider />
+
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
           </Menu>
