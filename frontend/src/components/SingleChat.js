@@ -15,7 +15,13 @@ import animationData from "../animations/typing.json";
 import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+
+// ***********************
+// 🔥 RENDER BACKEND URL
+// ***********************
+const ENDPOINT = "https://chat-app-backend-xftk.onrender.com";
+const BASE_URL = "https://chat-app-backend-xftk.onrender.com";
+
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -35,8 +41,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const { selectedChat, setSelectedChat, user, notification, setNotification } =
-    ChatState();
+
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    notification,
+    setNotification,
+  } = ChatState();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -50,10 +62,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       setLoading(true);
 
+      // ✔ Corrected FULL API URL
       const { data } = await axios.get(
-        `/api/message/${selectedChat._id}`,
+        `${BASE_URL}/api/message/${selectedChat._id}`,
         config
       );
+
       setMessages(data);
       setLoading(false);
 
@@ -80,15 +94,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Authorization: `Bearer ${user.token}`,
           },
         };
+
         setNewMessage("");
+
+        // ✔ FULL POST URL fixed
         const { data } = await axios.post(
-          "/api/message",
+          `${BASE_URL}/api/message`,
           {
             content: newMessage,
             chatId: selectedChat,
           },
           config
         );
+
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
@@ -110,21 +128,18 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
-
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     fetchMessages();
 
     selectedChatCompare = selectedChat;
-    // eslint-disable-next-line
   }, [selectedChat]);
 
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
       if (
-        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        !selectedChatCompare ||
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
         if (!notification.includes(newMessageRecieved)) {
@@ -196,6 +211,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 </>
               ))}
           </Text>
+
           <Box
             d="flex"
             flexDir="column"
@@ -231,14 +247,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <div>
                   <Lottie
                     options={defaultOptions}
-                    // height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
                   />
                 </div>
-              ) : (
-                <></>
-              )}
+              ) : null}
+
               <Input
                 variant="filled"
                 bg="#E0E0E0"
@@ -250,7 +264,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           </Box>
         </>
       ) : (
-        // to get socket.io on same page
         <Box d="flex" alignItems="center" justifyContent="center" h="100%">
           <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting
