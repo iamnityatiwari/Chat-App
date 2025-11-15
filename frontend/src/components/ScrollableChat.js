@@ -9,6 +9,8 @@ import {
 } from "../config/ChatLogics";
 import { ChatState } from "../Context/ChatProvider";
 
+const BASE_URL = "https://chat-app-backend-xftk.onrender.com";
+
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
 
@@ -26,7 +28,11 @@ const ScrollableChat = ({ messages }) => {
                   size="sm"
                   cursor="pointer"
                   name={m.sender.name}
-                  src={m.sender.pic}
+                  src={
+                    m.sender.pic.startsWith("http")
+                      ? m.sender.pic
+                      : `${BASE_URL}${m.sender.pic}`
+                  }
                 />
               </Tooltip>
             )}
