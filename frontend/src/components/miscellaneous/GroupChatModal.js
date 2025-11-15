@@ -30,6 +30,8 @@ const GroupChatModal = ({ children }) => {
 
   const { user, chats, setChats } = ChatState();
 
+  const BASE_URL = "https://chat-app-backend-xftk.onrender.com";
+
   const handleGroup = (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {
       toast({
@@ -58,8 +60,10 @@ const GroupChatModal = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
-      console.log(data);
+      const { data } = await axios.get(
+        `${BASE_URL}/api/user?search=${search}`,
+        config
+      );
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -81,7 +85,7 @@ const GroupChatModal = ({ children }) => {
   const handleSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
       toast({
-        title: "Please fill all the feilds",
+        title: "Please fill all the fields",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -96,14 +100,16 @@ const GroupChatModal = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
+
       const { data } = await axios.post(
-        `/api/chat/group`,
+        `${BASE_URL}/api/chat/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),
         },
         config
       );
+
       setChats([data, ...chats]);
       onClose();
       toast({
@@ -116,7 +122,7 @@ const GroupChatModal = ({ children }) => {
     } catch (error) {
       toast({
         title: "Failed to Create the Chat!",
-        description: error.response.data,
+        description: error.response?.data,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -166,7 +172,6 @@ const GroupChatModal = ({ children }) => {
               ))}
             </Box>
             {loading ? (
-              // <ChatLoading />
               <div>Loading...</div>
             ) : (
               searchResult
